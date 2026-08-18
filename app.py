@@ -414,7 +414,7 @@ with tab_new:
 
     input_mode = st.radio(
         "Input method",
-        ["✍️ Paste transcript", "📄 Upload .txt", "🎙️ Record audio", "📸 Snap Whiteboard/Notes"],
+        ["✍️ Paste transcript", "📄 Upload .txt", "🎙️ Record audio", "📸 Take Photo (Camera)", "🖼️ Upload Photo"],
         horizontal=True)
 
     with st.form("meeting_form", clear_on_submit=False):
@@ -441,11 +441,18 @@ with tab_new:
             if audio_file:
                 audio_bytes = audio_file.read()
                 audio_mime = audio_file.type or "audio/wav"
-        else:
+        elif input_mode == "📸 Take Photo (Camera)":
             camera_photo = st.camera_input("Take a photo of the whiteboard or notes")
             if camera_photo:
                 image_bytes = camera_photo.read()
                 image_mime = camera_photo.type or "image/jpeg"
+        else:
+            uploaded_photo = st.file_uploader("Upload a photo of the whiteboard or notes",
+                                               type=["jpg", "jpeg", "png"])
+            if uploaded_photo:
+                st.image(uploaded_photo, caption="Preview", use_container_width=True)
+                image_bytes = uploaded_photo.read()
+                image_mime = uploaded_photo.type or "image/jpeg"
 
         submitted = st.form_submit_button("🚀 Extract Action Items", use_container_width=True)
 
@@ -454,7 +461,7 @@ with tab_new:
         if not api_key:
             st.error("Please enter your Gemini API key in the sidebar first.")
         elif not transcript_text and not audio_bytes and not image_bytes:
-            st.error("Please paste a transcript, upload a file, record audio, or take a photo.")
+            st.error("Please paste a transcript, upload a file, record audio, or provide a photo.")
         else:
             with st.spinner("Gemini is reading the input and extracting action items, risks, and more..."):
                 try:
@@ -733,13 +740,13 @@ with tab_trends:
 with tab_arch:
     st.subheader("System Architecture")
     st.markdown("""
-**Data flow:** Input (text / file / audio / camera photo) → optional local PII redaction
-(regex, no API call) → Gemini (system-prompted, JSON-mode, single call returns action items
-+ efficiency score + tone + risks + decisions + open questions + confidence + detected
-language) → `st.session_state` → editable dashboard → carried-over and change-since-last-meeting
-detection (local string-matching, no extra API call) → export (CSV / Slack / PDF) / follow-up
-email / Q&A chat (each an on-demand second API call, only triggered by explicit user action
-to keep API usage efficient).
+**Data flow:** Input (text / file / audio / camera photo / uploaded photo) → optional local
+PII redaction (regex, no API call) → Gemini (system-prompted, JSON-mode, single call returns
+action items + efficiency score + tone + risks + decisions + open questions + confidence +
+detected language) → `st.session_state` → editable dashboard → carried-over and
+change-since-last-meeting detection (local string-matching, no extra API call) → export
+(CSV / Slack / PDF) / follow-up email / Q&A chat (each an on-demand second API call, only
+triggered by explicit user action to keep API usage efficient).
 """)
     st.components.v1.html("""
         <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
