@@ -4,7 +4,9 @@
 > Turn chaotic meeting transcripts, recordings, or whiteboard photos into structured, assignable action items — powered by Google Gemini.
 
 🔗 **Live App:** https://meeting-mind-ai-nbj74dhgw4jqravquwp4jf.streamlit.app/
+
 🎓 **Built for:** MirAI School of Technology — AI Builder Virtual Summer Internship 2026 Capstone
+
 👩‍💻 **Author:** Aarti Yadav
 
 ---
